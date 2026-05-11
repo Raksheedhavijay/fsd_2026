@@ -7,7 +7,7 @@ const connectDB = require('./utils/db');
 const { getLanIP } = require('./utils/getIP');
 
 const app = express();
-app.set('trust proxy', true);
+app.set('trust proxy',1);
 connectDB();
 
 const allowedOrigins = [
