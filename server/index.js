@@ -10,14 +10,29 @@ const app = express();
 app.set('trust proxy',1);
 connectDB();
 
-const allowedOrigins = [
-  'http://localhost:3000',
-  process.env.CLIENT_URL,
-].filter(Boolean);
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? [
+      'https://fsd-2026.vercel.app',
+      process.env.CLIENT_URL,
+    ].filter(Boolean)
+  : [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      process.env.CLIENT_URL,
+    ].filter(Boolean);
 
 app.use(cors({
-  origin: (origin, cb) => cb(null, true),
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      cb(null, true);
+    } else {
+      console.warn('CORS rejected origin:', origin);
+      cb(null, true); // Allow for now, log for debugging
+    }
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(express.json());
